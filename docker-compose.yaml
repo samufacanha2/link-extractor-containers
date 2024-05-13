@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  api-ruby:
+    image: linkextractor-api:step6-ruby
+    build: ./ruby/api
+    ports:
+      - "4567:4567"
+    environment:
+      - REDIS_URL=redis://redis-rb:6379
+    volumes:
+      - ./ruby/logs:/app/logs
+
+  api-python:
+    image: linkextractor-api:step5-python
+    build: ./python/api
+    ports:
+      - "5000:5000"
+    environment:
+      - REDIS_URL=redis://redis-py:6379
+
+  redis-py:
+    image: redis
+  redis-rb:
+    image: redis
+
+  locust:
+    image: locustio/locust
+    volumes:
+      - ./locustfile.py:/mnt/locust/locustfile.py
+    command: -f /mnt/locust/locustfile.py --host=http://api-python:5000
+    ports:
+      - "8089:8089"
