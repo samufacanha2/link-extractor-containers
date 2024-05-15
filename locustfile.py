@@ -13,6 +13,6 @@ class WebsiteUser(HttpUser):
     wait_time = between(1, 2.5)
 
     @task
-    def attack_via_python(self):
+    def attack(self):
         for host in attacked_hosts:
-            self.client.get(f"http://api-python:5000/api/{host}", verify=False)
+            self.client.get(f"/api/{host}")

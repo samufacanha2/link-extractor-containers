@@ -1,8 +1,7 @@
-version: '3'
+version: "3"
 
 services:
   api:
-    image: linkextractor-api:step6-ruby
     build: ./api
     ports:
       - "4567:4567"

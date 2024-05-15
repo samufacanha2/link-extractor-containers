@@ -1,16 +1,28 @@
-#!/usr/bin/env python
-
 import sys
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+import ssl
+from requests.adapters import HTTPAdapter
+from urllib3.poolmanager import PoolManager
+
+
+class UnsafeLegacyAdapter(HTTPAdapter):
+    def init_poolmanager(self, *args, **kwargs):
+        context = ssl.create_default_context()
+        context.options |= 0x4  # SSL_OP_LEGACY_SERVER_CONNECT
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+        kwargs["ssl_context"] = context
+        return super(UnsafeLegacyAdapter, self).init_poolmanager(*args, **kwargs)
 
 
 def extract_links(url):
-    res = requests.get(url, verify=False)
+    session = requests.Session()
+    session.mount("https://", UnsafeLegacyAdapter())
+    res = session.get(url, verify=False)
     soup = BeautifulSoup(res.text, "html.parser")
     base = url
-    # TODO: Update base if a <base> element is present with the href attribute
     links = []
     for link in soup.find_all("a"):
         links.append(
