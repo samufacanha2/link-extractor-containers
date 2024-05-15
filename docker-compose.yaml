@@ -12,6 +12,13 @@ services:
     depends_on:
       - redis-rb
 
+  api-ruby-nocache:
+    build: ./ruby_nocache/api
+    ports:
+      - "4568:4567"
+    volumes:
+      - ./ruby_nocache/logs:/app/logs
+
   api-python:
     build: ./python/api
     ports:
@@ -21,12 +28,33 @@ services:
     depends_on:
       - redis-py
 
+  api-python-nocache:
+    build: ./python_nocache/api
+    ports:
+      - "5001:5000"
+
   redis-py:
     image: redis
   redis-rb:
     image: redis
 
-  locust:
+  locust-rb:
+    image: locustio/locust
+    volumes:
+      - ./locustfile.py:/mnt/locust/locustfile.py
+    command: -f /mnt/locust/locustfile.py --host=http://api-ruby:4567
+    ports:
+      - "8090:8089"
+
+  locust-rb-nocache:
+    image: locustio/locust
+    volumes:
+      - ./locustfile.py:/mnt/locust/locustfile.py
+    command: -f /mnt/locust/locustfile.py --host=http://api-ruby-nocache:4567
+    ports:
+      - "8091:8089"
+
+  locust-py:
     image: locustio/locust
     volumes:
       - ./locustfile.py:/mnt/locust/locustfile.py
@@ -34,4 +62,12 @@ services:
     # command: -f /mnt/locust/locustfile.py --host=http://api-ruby:4567
     ports:
       - "8089:8089"
+
+  locust-py-nocache:
+    image: locustio/locust
+    volumes:
+      - ./locustfile.py:/mnt/locust/locustfile.py
+    command: -f /mnt/locust/locustfile.py --host=http://api-python-nocache:5000
+    ports:
+      - "8092:8089"
 # variar: quantidade de usuários, cache e versão (ruby ou python), gerar gráficos para cada uma das combinações

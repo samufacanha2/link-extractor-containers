@@ -2,10 +2,16 @@ from locust import HttpUser, task, between
 
 #
 attacked_hosts = (
-    "http://example.com/",
     "https://uol.unifor.br/",
     "https://ead.unifor.br/",
     "https://www.unifor.br/",
+    "https://www.youtube.com/",
+    "https://www.google.com/",
+    "https://www.facebook.com/",
+    "https://www.instagram.com/",
+    "https://www.twitter.com/",
+    "https://www.linkedin.com/",
+    "https://www.github.com/",
 )
 
 
